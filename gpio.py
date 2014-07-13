@@ -109,7 +109,5 @@ else:
 	GPIO.add_event_detect(sens, GPIO.RISING, callback=printFunction, bouncetime=sens_bounce_ms)
 	
 
-while True:
-	pass
+signal.pause()
 
-GPIO.cleanup()
