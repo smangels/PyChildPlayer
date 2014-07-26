@@ -22,7 +22,7 @@ class TestSequence(unittest.TestCase):
                 self.assertTrue(self.led.getPin() == 23)
 
         def test_nameCorrect(self):
-                # check whether initial values is correct
+                # check whether initial values is correct or not
                 self.assertTrue(self.led.getState() == "off")
 
         def test_getStateChange(self):
