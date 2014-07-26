@@ -45,21 +45,21 @@ def ledThread(cmdQueue, pin, period=1):
                         if cmd == "exit":
                                 exit_flag = True
                         else:
-                                print " >> pin:%d => received: %s \n" % (pin, cmd)
+                                #print " >> pin:%d => received: %s \n" % (pin, cmd)
                                 if cmd[0] == "blink":
-                                        print " >> pin %d mode blink" % pin
+                                        #print " >> pin %d mode blink" % pin
                                         if cmd[1] < period:
                                                 exit_flag = True
                                         else:
                                                 mode = cmd[0]
                                                 cntr_on = (cmd[1] / period) - 1
                                                 cntr_off = (cmd[2] / period) - 1
-                                                print (" >> pin %d, %d/%d" % (pin, cntr_on, cntr_off))
+                                                #print (" >> pin %d, %d/%d" % (pin, cntr_on, cntr_off))
                                 elif cmd[0] == "off":
-                                        print " >> pin %d, OFF" % pin
+                                        #print " >> pin %d, OFF" % pin
                                         mode = "off"
                                 elif cmd[0] == "on":
-                                        print " >> pin %d, ON" % pin
+                                        #print " >> pin %d, ON" % pin
                                         mode = "on"
 
                                 cmd = ""
@@ -77,25 +77,36 @@ class Led(object):
                 self._thread.daemon = True
                 self.off()
                 self._thread.start()
-                print("LED.init: new LED object %s, state=%s" % (self._name, self._state) )
+                # print("LED.init: new LED object %s, state=%s" % (self._name, self._state) )
+                return None
         
         def __del__(self):
                 self.off()
                 self._queue.put("exit")
                 self._thread.join()
-                print("Led: finished destructor for %s" % self._name)
+                #print("Led: finished destructor for %s" % self._name)
+                return None
         
         def blink(self, onTime, offTime):
                 self.state = "blink"
                 self._queue.put([ "blink", onTime, offTime])
+                return self.state
         
         def off(self):
                 self.state = "off"
                 self._queue.put( ["off"] )
+                return self.state
 
         def on(self):
                 self.state = "on"
                 self._queue.put( ["on"] )
+                return self.state
+
+        def getState(self):
+                return self._state
+
+        def getPin(self):
+                return self._pin
 
         def __str__(self):
                 s = "Led (%s), Pin=%d, State=%s" % (self._name, self._pin, self._state)

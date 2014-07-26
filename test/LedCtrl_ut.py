@@ -11,19 +11,14 @@ from LedCtrl import Led
 class TestSequence(unittest.TestCase):
 
         def setUp(self):
-                pass
+                self.led = None
+                self.led       = Led("ledYellow", 23)
 
         def test_createLed(self):
-
                 cmds = [ "blink", "on", "off" ]
-                
-                ledYellow = Led("ledYellow", 23)
-                ledGreen = Led("ledGreen", 21)
-                ledRed = Led("ledRed", 22)
+                self.assertTrue(isinstance(self.led, Led))
 
-                print ledYellow
-                print ledGreen
-                print ledRed
+        
 
 
 
