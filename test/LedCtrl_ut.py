@@ -25,6 +25,8 @@ class TestSequence(unittest.TestCase):
                 self.assertTrue(self.led.getState() == "off")
 
         def test_getStateChange(self):
+                # perform a state change and check the resulting 
+                # state using the provided interface
                 self.assertTrue(self.led.getState() == "off")
                 self.led.blink(10, 20)
                 self.assertTrue(self.led.getState() == "blink")
