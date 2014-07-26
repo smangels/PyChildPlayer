@@ -17,7 +17,7 @@ def ledThread(cmdQueue, pin, period=1):
         offTime = 0
         mode = ""
         state = "off"
-        print " >> init thread for pin %d, period=%2.3f" % (pin, period)
+        #print " >> init thread for pin %d, period=%2.3f" % (pin, period)
         
         while not exit_flag:
                 try:
@@ -58,6 +58,7 @@ def ledThread(cmdQueue, pin, period=1):
                                 elif cmd[0] == "off":
                                         #print " >> pin %d, OFF" % pin
                                         mode = "off"
+                                        state = "off"
                                 elif cmd[0] == "on":
                                         #print " >> pin %d, ON" % pin
                                         mode = "on"
@@ -88,19 +89,19 @@ class Led(object):
                 return None
         
         def blink(self, onTime, offTime):
-                self.state = "blink"
+                self._state = "blink"
                 self._queue.put([ "blink", onTime, offTime])
-                return self.state
+                return self._state
         
         def off(self):
-                self.state = "off"
+                self._state = "off"
                 self._queue.put( ["off"] )
-                return self.state
+                return self._state
 
         def on(self):
-                self.state = "on"
+                self._state = "on"
                 self._queue.put( ["on"] )
-                return self.state
+                return self._state
 
         def getState(self):
                 return self._state

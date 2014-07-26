@@ -17,9 +17,17 @@ class TestSequence(unittest.TestCase):
         def test_createLed(self):
                 cmds = [ "blink", "on", "off" ]
                 self.assertTrue(isinstance(self.led, Led))
-
         
+        def test_pinCorrect(self):
+                self.assertTrue(self.led.getPin() == 23)
 
+        def test_nameCorrect(self):
+                self.assertTrue(self.led.getState() == "off")
+
+        def test_getStateChange(self):
+                self.assertTrue(self.led.getState() == "off")
+                self.led.blink(10, 20)
+                self.assertTrue(self.led.getState() == "blink")
 
 
 if __name__ == "__main__":
