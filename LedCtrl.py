@@ -23,6 +23,7 @@ def ledThread(cmdQueue, pin, period=1):
                 try:
                         cmd = cmdQueue.get(block=True, timeout=1)
                 except Queue.Empty:
+                        # queue is empty, blocking call returns with exception
                         if mode == "blink":
                                 if state == "off":
                                         if cntr > 0:
@@ -40,6 +41,7 @@ def ledThread(cmdQueue, pin, period=1):
                                                 cntr = offTime
 
                 else:
+                        # queue contains a new command, decode and run
                         if cmd == "exit":
                                 exit_flag = True
                         else:
@@ -59,10 +61,9 @@ def ledThread(cmdQueue, pin, period=1):
                                 elif cmd[0] == "on":
                                         print " >> pin %d, ON" % pin
                                         mode = "on"
+
                                 cmd = ""
                                 cntr += 1
-
-        print " >> exit thread: %d, cntr=%d" % (pin, cntr)
 
 
 class Led(object):
@@ -85,33 +86,20 @@ class Led(object):
                 print("Led: finished destructor for %s" % self._name)
         
         def blink(self, onTime, offTime):
+                self.state = "blink"
                 self._queue.put([ "blink", onTime, offTime])
         
         def off(self):
-                self._queue.put( ["off"])
+                self.state = "off"
+                self._queue.put( ["off"] )
 
+        def on(self):
+                self.state = "on"
+                self._queue.put( ["on"] )
 
-def main():
+        def __str__(self):
+                s = "Led (%s), Pin=%d, State=%s" % (self._name, self._pin, self._state)
+                return s
 
-        signal.signal(signal.SIGINT, signal_handler)
-
-        cmds = [ "blink", "on", "off" ]
-        
-        ledYellow = Led("ledYellow", 23)
-        ledGreen = Led("ledGreen", 21)
-        ledRed = Led("ledRed", 22)
-
-        print ("all threads created")
-
-        ledYellow.blink(1, 0.5)
-        ledGreen.blink(2, 0.5)
-        ledRed.blink(2, 0.5)
-
-        time.sleep(20)
-
-
-    
-if __name__ == "__main__":
-    main()
 
 # EOF
