@@ -77,10 +77,10 @@ GPIO.setmode(GPIO.BCM)
 signal.signal(signal.SIGINT, signal_handler)
 
 # configure GPIOs
-sens = 17
-led_yellow = 21
-led_green = 22
-led_red = 23
+sens = 23
+led_yellow = 17
+led_green = 27
+led_red = 22
 led_all = [led_yellow, led_green, led_red]
 sens_bounce_ms = 150
 
@@ -89,6 +89,10 @@ GPIO.setup(led_yellow, GPIO.OUT)
 GPIO.setup(led_green, GPIO.OUT)
 GPIO.setup(led_red, GPIO.OUT)
 print "initiated: GPIO"
+
+GPIO.output(led_red, GPIO.LOW)
+
+exit()
 
 camera = picamera.PiCamera()
 camera.resolution = (1024, 768)
