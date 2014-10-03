@@ -1,12 +1,12 @@
 import RPi.GPIO as GPIO
 import signal
 import sys
-import picamera
+#import picamera
 import time
 import zbar
 import io
-from PIL import Image
-from mpdclient import mpdclient
+#from PIL import Image
+#from mpdclient import mpdclient
 
 
 def led_all_off():
@@ -78,9 +78,9 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # configure GPIOs
 sens = 23
-led_yellow = 17
-led_green = 27
-led_red = 22
+led_yellow = 27
+led_green = 22
+led_red = 17
 led_all = [led_yellow, led_green, led_red]
 sens_bounce_ms = 150
 
@@ -90,8 +90,11 @@ GPIO.setup(led_green, GPIO.OUT)
 GPIO.setup(led_red, GPIO.OUT)
 print "initiated: GPIO"
 
-GPIO.output(led_red, GPIO.LOW)
+GPIO.output(led_red, GPIO.HIGH)
+GPIO.output(led_yellow, GPIO.HIGH)
+GPIO.output(led_green, GPIO.HIGH)
 
+signal.pause()
 exit()
 
 camera = picamera.PiCamera()
