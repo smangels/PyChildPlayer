@@ -6,7 +6,7 @@ import time
 import zbar
 import io
 #from PIL import Image
-#from mpdclient import mpdclient
+from mpdclient import mpdclient
 
 
 def led_all_off():
