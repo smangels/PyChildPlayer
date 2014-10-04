@@ -55,15 +55,6 @@ def cam_capture():
 
 def printFunction(channel):
 	print ("edge: %d" % channel)
-	if (GPIO.input(sens) == 1):
-		GPIO.output(led_red, GPIO.HIGH)
-		print ("QR tag detected")
-		cam_capture()
-		print ("image take")
-	else:
-		GPIO.output(led_red, GPIO.LOW)
-		client.pause()
-		print ("QR tag removed")
 	
 def signal_handler(signal, frame):
 	print ("Ctrl-C detected")
@@ -82,9 +73,9 @@ led_yellow = 27
 led_green = 22
 led_red = 17
 led_all = [led_yellow, led_green, led_red]
-sens_bounce_ms = 150
+sens_bounce_ms = 300
 
-GPIO.setup(sens, GPIO.IN)
+GPIO.setup(sens, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(led_yellow, GPIO.OUT)
 GPIO.setup(led_green, GPIO.OUT)
 GPIO.setup(led_red, GPIO.OUT)
@@ -94,18 +85,6 @@ GPIO.output(led_red, GPIO.HIGH)
 GPIO.output(led_yellow, GPIO.HIGH)
 GPIO.output(led_green, GPIO.HIGH)
 
-signal.pause()
-exit()
-
-camera = picamera.PiCamera()
-camera.resolution = (1024, 768)
-camera.start_preview()
-time.sleep(2)
-print "initiated: camera module"
-
-client = mpdclient()
-# client.add("Alexi Murdoch/Towards The Sun")
-print "initiated: MPD"
 
 
 if (GPIO.input(sens) == 1):
@@ -118,3 +97,4 @@ else:
 
 signal.pause()
 
+exit ()
