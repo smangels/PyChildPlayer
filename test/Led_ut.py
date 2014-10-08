@@ -13,6 +13,7 @@ class TestSequence(unittest.TestCase):
         def setUp(self):
 		GPIO.setmode(GPIO.BCM)
                 self.led = None
+		self.wait = 0.2
 		print "SETUP finished"
 
 	def tearDown(self):
@@ -27,7 +28,7 @@ class TestSequence(unittest.TestCase):
 		print self.led
 		self.assertEqual(GPIO.input(27), 0)
 		self.led.on()
-		sleep(1)
+		sleep(self.wait)
 		self.assertEqual(GPIO.input(27), 1)
 		return None
 
@@ -37,7 +38,7 @@ class TestSequence(unittest.TestCase):
 		self.assertEqual(GPIO.input(17), 0)
 		print GPIO.input(17)
 		self.led.on()
-		sleep(1)
+		sleep(self.wait)
 		self.assertEqual(GPIO.input(17), 1)
 		return None
 
@@ -47,7 +48,7 @@ class TestSequence(unittest.TestCase):
                 self.assertEqual(GPIO.input(22), 0)
                 print GPIO.input(22)
                 self.led.on()
-                sleep(1)
+                sleep(self.wait)
                 self.assertEqual(GPIO.input(22), 1)
                 return None
 
