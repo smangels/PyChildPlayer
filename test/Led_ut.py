@@ -41,6 +41,16 @@ class TestSequence(unittest.TestCase):
 		self.assertEqual(GPIO.input(17), 1)
 		return None
 
+	def test_createLedGreen(self):
+                self.led = Led(22, "green LED")
+                print self.led
+                self.assertEqual(GPIO.input(22), 0)
+                print GPIO.input(22)
+                self.led.on()
+                sleep(1)
+                self.assertEqual(GPIO.input(22), 1)
+                return None
+
 if __name__ == "__main__":
     unittest.main()
 
