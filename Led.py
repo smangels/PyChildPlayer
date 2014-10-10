@@ -8,12 +8,16 @@ class Led(object):
 		self._name = name
 		GPIO.setup(self._pin, GPIO.OUT)
 		GPIO.output(self._pin, GPIO.LOW)
+		print "create LED for pin %d" % pin
 
 	def off(self):
 		GPIO.output(self._pin, GPIO.LOW)
 
 	def on(self):
 		GPIO.output(self._pin, GPIO.HIGH)
+
+	def getPin(self):
+		return self._pin
 
 	def __del__(self):
 		GPIO.output(self._pin, GPIO.LOW)
