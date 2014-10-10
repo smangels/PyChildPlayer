@@ -11,17 +11,15 @@ from Led import Led
 class TestSequence(unittest.TestCase):
 
         def setUp(self):
-		GPIO.setmode(GPIO.BCM)
+		# GPIO.setmode(GPIO.BCM)
                 self.led = None
-		self.wait = 0.2
-		print "SETUP finished"
+		self.wait = 0.1
 
 	def tearDown(self):
 		pin = self.led._pin
 		del self.led
 		self.assertEqual(GPIO.input(pin), 0)
 		GPIO.cleanup()
-		print "DESTROY finished"
 
         def test_createLedYellow(self):
                 self.led       = Led(27, "yellow LED")

@@ -3,114 +3,101 @@ import threading
 import time
 import Queue
 import signal
+from Led import Led
+
+
 
 def signal_handler(signal, frame):
         print ("Ctrl-C detected")
         sys.exit()
 
-def ledThread(cmdQueue, pin, period=1):
+def ledThread(listLed, cmdQueue, period=1):
         myThreadId = threading.current_thread()
         exit_flag = False
-        cmd = cmdQueue.get()
-        cntr = 0
-        onTime = 0
-        offTime = 0
-        mode = ""
-        state = "off"
-        #print " >> init thread for pin %d, period=%2.3f" % (pin, period)
+        print " >> init threading"
         
         while not exit_flag:
                 try:
-                        cmd = cmdQueue.get(block=True, timeout=1)
-                except Queue.Empty:
-                        # queue is empty, blocking call returns with exception
-                        if mode == "blink":
-                                if state == "off":
-                                        if cntr > 0:
-                                                cntr -= 1
-                                        else:
-                                                print " >> pin %d invert" % pin
-                                                state = "on"
-                                                cntr = onTime
-                                elif state == "on":
-                                        if cntr > 0:
-                                                cntr -= 1
-                                        else:
-                                                print " >> pin %d invert" % pin
-                                                state = "off"
-                                                cntr = offTime
-
+                        cmd = cmdQueue.get(block=True, timeout=0.05)
+		except Queue.Empty:
+                        # queue is empty, timeout occurred
+			continue
                 else:
                         # queue contains a new command, decode and run
                         if cmd == "exit":
                                 exit_flag = True
-                        else:
-                                #print " >> pin:%d => received: %s \n" % (pin, cmd)
-                                if cmd[0] == "blink":
-                                        #print " >> pin %d mode blink" % pin
-                                        if cmd[1] < period:
-                                                exit_flag = True
-                                        else:
-                                                mode = cmd[0]
-                                                cntr_on = (cmd[1] / period) - 1
-                                                cntr_off = (cmd[2] / period) - 1
-                                                #print (" >> pin %d, %d/%d" % (pin, cntr_on, cntr_off))
-                                elif cmd[0] == "off":
-                                        #print " >> pin %d, OFF" % pin
-                                        mode = "off"
-                                        state = "off"
-                                elif cmd[0] == "on":
-                                        #print " >> pin %d, ON" % pin
-                                        mode = "on"
+				print "exit the thread %d" % myThreadId
 
-                                cmd = ""
-                                cntr += 1
+			elif cmd == "cmd":
+				print "received a command for LED %d" % cmd[1]
+
+			else:
+				print "invalid command in queue"
+
+	print "finished THREAD %d " % myThreadId
+
+class LedCtrl(object):
+
+	# defines for frequently used LED pattern
+	LED_OFF = [ 0, 0, 0, 0 ]
+	LED_ON  = [ 1, 0, 0, 0 ]
+	LED_BLINK = [ 5, 10, 0, 0 ]
+	LED_ERR_INVALID_QR_CODE = [ 5, 10, 3, 20 ]
 
 
-class Led(object):
-
-        def __init__(self, name, pin, state=False, period=0.25):
-                self._name = name
-                self._pin = pin
-                self._state = state
+        def __init__(self):
+		self._running = False
                 self._queue = Queue.Queue(2)
-                self._thread = threading.Thread(target=ledThread, args=(self._queue, self._pin, period) )
-                self._thread.daemon = True
-                self.off()
-                self._thread.start()
-                # print("LED.init: new LED object %s, state=%s" % (self._name, self._state) )
+		self._ledList = []
                 return None
         
         def __del__(self):
-                self.off()
-                self._queue.put("exit")
-                self._thread.join()
-                #print("Led: finished destructor for %s" % self._name)
+		if self._running == True:
+			self._queue.put("exit")
+			self._thread.join()
                 return None
+
+	def addLed(self, pin):
+		for led in self._ledList:
+			if (pin == led.getPin):
+				print "failed to add, does already exist"
+				return False
+
+		self._ledList.append(Led(pin))
+		return True
+
+	def sendCmd(self, pin, sequence):
+		if self._running == True:
+			self._queue.put(["cmd", pin, sequence])
+			print "send cmd for pin %d" % pin
+		else:
+			print "no thread - no queue"
+
+		return False
         
-        def blink(self, onTime, offTime):
-                self._state = "blink"
-                self._queue.put([ "blink", onTime, offTime])
-                return self._state
-        
-        def off(self):
-                self._state = "off"
-                self._queue.put( ["off"] )
-                return self._state
+	def startThread(self):
+		if not self._running:
+		 	self._thread = threading.Thread(target=ledThread, args=(self._ledList, self._queue, 1) ).start()
+                	#self._thread.daemon = True
+			#self._thread.start()
+			self._running = True
+			print "thread started"
+			return None
+		else:
+			print "tread is already running"
+			return False
 
-        def on(self):
-                self._state = "on"
-                self._queue.put( ["on"] )
-                return self._state
-
-        def getState(self):
-                return self._state
-
-        def getPin(self):
-                return self._pin
+	def stopThread():
+		if self._running == True:
+			self._queue.put("exit")
+			print "EXIT sent to thread"
+		else:
+			print "no thread running"
 
         def __str__(self):
-                s = "Led (%s), Pin=%d, State=%s" % (self._name, self._pin, self._state)
+                s = "currently not implemented"
+		for led in self._ledList:
+			print led
                 return s
 
 

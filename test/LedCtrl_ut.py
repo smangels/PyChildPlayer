@@ -1,37 +1,39 @@
 # test LedCtrl class
 
 import unittest
-import sys
+import sys 
+import RPi.GPIO as GPIO
+from time import sleep
 
 sys.path.append('../')
 
-from LedCtrl import Led
-
+from LedCtrl import LedCtrl
+	
 
 class TestSequence(unittest.TestCase):
 
         def setUp(self):
-                self.led = None
-                self.led       = Led("ledYellow", 23)
+                self.ctrl = None
+		GPIO.setmode(GPIO.BCM)
+
+	def tearDown(self):
+		del self.ctrl
+		GPIO.cleanup()
 
         def test_createLed(self):
-                cmds = [ "blink", "on", "off" ]
-                self.assertTrue(isinstance(self.led, Led))
-        
-        def test_pinCorrect(self):
-                self.assertTrue(self.led.getPin() == 23)
+		self.ctrl = LedCtrl()
+		self.ctrl.addLed(17)
+		self.ctrl.addLed(27)
+		self.ctrl.addLed(22)
+                self.assertTrue(isinstance(self.ctrl, LedCtrl))
 
-        def test_nameCorrect(self):
-                # check whether initial values is correct or not
-                self.assertTrue(self.led.getState() == "off")
-
-        def test_getStateChange(self):
-                # perform a state change and check the resulting 
-                # state using the provided interface
-                self.assertTrue(self.led.getState() == "off")
-                self.led.blink(10, 20)
-                self.assertTrue(self.led.getState() == "blink")
-
+	def test_switchLedOn(self):
+		self.ctrl = LedCtrl()
+		self.ctrl.addLed(17)
+		self.ctrl.addLed(27)
+		self.ctrl.startThread()
+		self.ctrl.sendCmd(17, self.ctrl.LED_ON)
+		self.ctrl.stopThread()
 
 if __name__ == "__main__":
     unittest.main()
