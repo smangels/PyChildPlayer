@@ -31,7 +31,7 @@ def ledThread(listLed, cmdQueue, period=1):
 				for led in listLed:
 					if cmd[1] == led.getPin():
 						led.on()
-						print "switched LED %d to ON" % cmd[1]
+						print "switched LED %d to ON, pattern: %s" % (cmd[1], cmd[2])
 						break
 			else:
 				print "invalid command in queue"

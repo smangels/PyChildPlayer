@@ -11,8 +11,8 @@ def signal_handler(signal, frame):
 
 GPIO.setmode(GPIO.BCM)
 
-led_green = 17
-led_red = 27
+led_green = 27
+led_red = 17
 led_yellow = 23
 
 ledCtrl = LedCtrl()
@@ -27,6 +27,8 @@ ledCtrl.startThread()
 print "started thread"
 sleep(5)
 ledCtrl.sendCmd(led_green, LedCtrl.LED_ON)
+sleep(1)
+ledCtrl.sendCmd(led_red, LedCtrl.LED_ON)
 sleep(5)
 ledCtrl.stopThread()
 sleep(3)
