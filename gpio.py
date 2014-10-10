@@ -8,7 +8,6 @@ import io
 #from PIL import Image
 from mpdclient import mpdclient
 
-
 def led_all_off():
 	for led in led_all:
 		GPIO.output(led, GPIO.LOW)
@@ -54,7 +53,20 @@ def cam_capture():
 	stream.close()
 
 def printFunction(channel):
-	print ("edge: %d" % channel)
+	global led_flag
+	print("PIN is %d" % led_flag)
+
+	if (GPIO.input(sens) == 1):
+		print "is high => return"
+		return
+
+	if (led_flag == 1):
+		GPIO.output(led_red, GPIO.LOW)
+		led_flag = 0
+	else:
+		GPIO.output(led_red, GPIO.HIGH)
+		led_flag = 1
+
 	
 def signal_handler(signal, frame):
 	print ("Ctrl-C detected")
@@ -68,6 +80,7 @@ GPIO.setmode(GPIO.BCM)
 signal.signal(signal.SIGINT, signal_handler)
 
 # configure GPIOs
+led_flag = 1
 sens = 23
 led_yellow = 27
 led_green = 22
@@ -85,14 +98,7 @@ GPIO.output(led_red, GPIO.HIGH)
 GPIO.output(led_yellow, GPIO.HIGH)
 GPIO.output(led_green, GPIO.HIGH)
 
-
-
-if (GPIO.input(sens) == 1):
-	print ("enabled FALLING")
-	GPIO.add_event_detect(sens, GPIO.FALLING, callback=printFunction, bouncetime=sens_bounce_ms)
-else:
-	print ("enabled RISING")
-	GPIO.add_event_detect(sens, GPIO.RISING, callback=printFunction, bouncetime=sens_bounce_ms)
+GPIO.add_event_detect(sens, GPIO.FALLING, callback=printFunction, bouncetime=sens_bounce_ms)
 	
 
 signal.pause()

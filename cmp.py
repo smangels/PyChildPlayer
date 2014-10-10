@@ -28,6 +28,7 @@ print "started thread"
 sleep(5)
 ledCtrl.sendCmd(led_green, LedCtrl.LED_ON)
 sleep(5)
-
+ledCtrl.stopThread()
+sleep(3)
 exit(0)
 
