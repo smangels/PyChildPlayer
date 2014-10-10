@@ -24,11 +24,15 @@ def ledThread(listLed, cmdQueue, period=1):
 			continue
                 else:
                         # queue contains a new command, decode and run
-                        if cmd == "exit":
+                        if cmd[0] == "exit":
                                 exit_flag = True
-			elif cmd == "cmd":
+			elif cmd[0] == "cmd":
 				print "received a command for LED %d" % cmd[1]
-
+				for led in listLed:
+					if cmd[1] == led.getPin():
+						led.on()
+						print "switched LED %d to ON" % cmd[1]
+						break
 			else:
 				print "invalid command in queue"
 
@@ -87,7 +91,7 @@ class LedCtrl(object):
 
 	def stopThread(self):
 		if self._running == True:
-			self._queue.put("exit")
+			self._queue.put(["exit"])
 			self._thread.join()
 			self._running = False
 			print "EXIT sent to thread"
