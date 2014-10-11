@@ -3,7 +3,7 @@ import threading
 import time
 import Queue
 import signal
-from Led import Led
+from LedPattern import LedPattern
 
 
 
@@ -17,56 +17,49 @@ def ledThread(listLed, cmdQueue, period=1):
         print " >> init threading"
         
         while not exit_flag:
-                try:
-                        cmd = cmdQueue.get(block=True, timeout=0.05)
-		except Queue.Empty:
-                        # queue is empty, timeout occurred
-			continue
-                else:
-                        # queue contains a new command, decode and run
-                        if cmd[0] == "exit":
-                                exit_flag = True
-			elif cmd[0] == "cmd":
-				print "received a command for LED %d" % cmd[1]
-				for led in listLed:
-					if cmd[1] == led.getPin():
-						led.on()
-						print "switched LED %d to ON, pattern: %s" % (cmd[1], cmd[2])
-						break
-			else:
-				print "invalid command in queue"
+            try:
+                cmd = cmdQueue.get(block=True, timeout=0.05)
+		    except Queue.Empty:
+			    continue
+            else:
+                if cmd[0] == "exit":
+                    exit_flag = True
+			    elif cmd[0] == "cmd":
+				    print "received a command for LED %d" % cmd[1]
+				    for led in listLed:
+					    if cmd[1] == led.getPin():
+						    led.setSequence(cmd[2])
+						    print "switched LED %d to ON, pattern: %s" % (cmd[1], cmd[2])
+						    break
+			    else:
+				    print "invalid command in queue"
 
 	print "finished THREAD"
 
 class LedCtrl(object):
 
 	# defines for frequently used LED pattern
-	LED_OFF = [ 0, 0, 0, 0 ]
-	LED_ON  = [ 1, 0, 0, 0 ]
-	LED_BLINK = [ 5, 10, 0, 0 ]
-	LED_ERR_INVALID_QR_CODE = [ 5, 10, 3, 20 ]
 
-
-        def __init__(self):
-		self._running = False
-                self._queue = Queue.Queue(2)
-		self._ledList = []
-                return None
+    def __init__(self):
+        self._running = False
+        self._queue = Queue.Queue(10)
+        self._ledList = []
+        return None
         
-        def __del__(self):
-		if self._running == True:
-			self._queue.put("exit")
-			self._thread.join()
-                return None
+    def __del__(self):
+        if self._running == True:
+            self._queue.put("exit")
+            self._thread.join()
+            return None
 
-	def addLed(self, pin):
-		for led in self._ledList:
-			if (pin == led.getPin):
-				print "failed to add, does already exist"
-				return False
+    def addLed(self, pin):
+        for led in self._ledList:
+            if (pin == led.getPin):
+                print "failed to add, does already exist"
+                return False
 
-		self._ledList.append(Led(pin))
-		return True
+        self._ledList.append(LedPattern(pin))
+        return True
 
 	def sendCmd(self, pin, sequence):
 		if self._running == True:
