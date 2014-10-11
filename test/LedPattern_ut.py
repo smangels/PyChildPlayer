@@ -27,17 +27,26 @@ class TestSequence(unittest.TestCase):
     def test_createPattern(self):
         self.pattern = LedPattern(17)
         self.pattern.setSequence([5, 5, 2, 10])
-        for step in range(100):
+        self.assertEqual(GPIO.input(17), 0)
+        for step in range(20):
             sleep(self.sleepTime)
             self.pattern.tick()
-            if step == 1:
+            if step == 1 or step == 4:
                 self.assertEqual(GPIO.input(17), 1)
+            elif step == 5 or step == 9:
+                self.assertEqual(GPIO.input(17), 0)
+            elif step == 10 or step == 14:
+                self.assertEqual(GPIO.input(17), 1)
+            elif step == 15 or step == 19:
+                self.assertEqual(GPIO.input(17), 0)            
+            
         self.pattern.getSequence()
         self.pattern.getMode()
         
     def test_JustOn(self):
         self.pattern = LedPattern(17)
         self.pattern.setSequence([1, 0, 0, 0])
+        self.assertEqual(GPIO.input(17), 0)
         for step in range(100):
             sleep(self.sleepTime)
             self.pattern.tick()
@@ -46,6 +55,7 @@ class TestSequence(unittest.TestCase):
     def test_JustOff(self):
         self.pattern = LedPattern(17)
         self.pattern.setSequence([0,0,0,0])
+        self.assertEqual(GPIO.input(17), 0)
         for step in range(100):
             sleep(self.sleepTime)
             self.pattern.tick()
