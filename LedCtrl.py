@@ -19,22 +19,26 @@ def ledThread(listLed, cmdQueue, period=1):
         while not exit_flag:
             try:
                 cmd = cmdQueue.get(block=True, timeout=0.05)
-		    except Queue.Empty:
+            except Queue.Empty:
 			    continue
             else:
                 if cmd[0] == "exit":
                     exit_flag = True
-			    elif cmd[0] == "cmd":
-				    print "received a command for LED %d" % cmd[1]
-				    for led in listLed:
-					    if cmd[1] == led.getPin():
-						    led.setSequence(cmd[2])
-						    print "switched LED %d to ON, pattern: %s" % (cmd[1], cmd[2])
-						    break
-			    else:
-				    print "invalid command in queue"
+                elif cmd[0] == "cmd":
+                    if len(cmd) < 3:
+                        print "!! invalid command"
+                        continue
+                    else:
+                        print "received a command for LED %d" % cmd[1]
+                        for led in listLed:
+                            if cmd[1] == led.getPin():
+                                led.setSequence(cmd[2])
+                                print "switched LED %d to ON, pattern: %s" % (cmd[1], cmd[2])
+                                break
+                else:
+                    print "unknown command in queue"
 
-	print "finished THREAD"
+        print "finished THREAD"
 
 class LedCtrl(object):
 
@@ -57,7 +61,6 @@ class LedCtrl(object):
             if (pin == led.getPin):
                 print "failed to add, does already exist"
                 return False
-
         self._ledList.append(LedPattern(pin))
         return True
 
