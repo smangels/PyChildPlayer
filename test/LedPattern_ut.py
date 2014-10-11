@@ -14,6 +14,8 @@ from LedPattern import LedPattern
 
 class TestSequence(unittest.TestCase):
 
+    sleepTime = 0.01
+
     def setUp(self):
         GPIO.setmode(GPIO.BCM)
         self.pattern = None
@@ -26,7 +28,7 @@ class TestSequence(unittest.TestCase):
         self.pattern = LedPattern(17)
         self.pattern.setSequence([5, 5, 2, 10])
         for step in range(100):
-            sleep(0.05)
+            sleep(self.sleepTime)
             self.pattern.tick()
             if step == 1:
                 self.assertEqual(GPIO.input(17), 1)
@@ -37,7 +39,7 @@ class TestSequence(unittest.TestCase):
         self.pattern = LedPattern(17)
         self.pattern.setSequence([1, 0, 0, 0])
         for step in range(100):
-            sleep(0.05)
+            sleep(self.sleepTime)
             self.pattern.tick()
             self.assertEqual(GPIO.input(17), 1)
 
@@ -45,7 +47,7 @@ class TestSequence(unittest.TestCase):
         self.pattern = LedPattern(17)
         self.pattern.setSequence([0,0,0,0])
         for step in range(100):
-            sleep(0.05)
+            sleep(self.sleepTime)
             self.pattern.tick()
             self.assertEqual(GPIO.input(17), 0)
 
