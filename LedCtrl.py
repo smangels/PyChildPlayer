@@ -18,11 +18,13 @@ def ledThread(listLed, cmdQueue, period=1):
         
         while not exit_flag:
             try:
-                cmd = cmdQueue.get(block=True, timeout=0.05)
+                cmd = cmdQueue.get(block=True, timeout=period)
             except Queue.Empty:
-			    continue
+                for led in listLed:
+                    led.tick()
             else:
-                if cmd[0] == "exit":
+                print "got command %s" % cmd
+                if cmd == "exit":
                     exit_flag = True
                 elif cmd[0] == "cmd":
                     if len(cmd) < 3:
@@ -36,13 +38,15 @@ def ledThread(listLed, cmdQueue, period=1):
                                 print "switched LED %d to ON, pattern: %s" % (cmd[1], cmd[2])
                                 break
                 else:
-                    print "unknown command in queue"
+                    print "unknown command in queue %s" % cmd[0]
+                    
+                cmdQueue.task_done()
 
         print "finished THREAD"
 
 class LedCtrl(object):
 
-	# defines for frequently used LED pattern
+    # defines for frequently used LED pattern
 
     def __init__(self):
         self._running = False
@@ -64,41 +68,44 @@ class LedCtrl(object):
         self._ledList.append(LedPattern(pin))
         return True
 
-	def sendCmd(self, pin, sequence):
-		if self._running == True:
-			self._queue.put(["cmd", pin, sequence])
-			print "send cmd for pin %d" % pin
-		else:
-			print "no thread - no queue"
+    def sendCmd(self, pin, sequence):
+        print "sendCmd: %d, seq:%s" % (pin, sequence)
+        if self._running == True:
+            self._queue.put(["cmd", pin, sequence])
+            print "send cmd for pin %d" % pin
+        else:
+            print "no thread - no queue"
+        return False
 
-		return False
-        
-	def startThread(self):
-		if not self._running:
-		 	self._thread = threading.Thread(target=ledThread, args=(self._ledList, self._queue, 1) )
-                	self._thread.daemon = True
-			self._thread.start()
-			self._running = True
-			print "thread started"
-			return None
-		else:
-			print "tread is already running"
-			return False
+    def startThread(self):
+        if not self._running:
+            self._thread = threading.Thread(target=ledThread, args=(self._ledList, self._queue, 0.05) )
+            self._thread.daemon = True
+            self._thread.start()
+            self._running = True
+            print "thread started"
+            return None
+        else:
+            print "tread is already running"
+            return False
+            
+    def checkRunning(self):
+        pass
 
-	def stopThread(self):
-		if self._running == True:
-			self._queue.put(["exit"])
-			self._thread.join()
-			self._running = False
-			print "EXIT sent to thread"
-		else:
-			print "no thread running"
+    def stopThread(self):
+        if self._running == True:
+            self._queue.put(["exit"])
+            self._thread.join()
+            self._running = False
+            print "EXIT sent to thread"
+        else:
+            print "no thread running"
 
-        def __str__(self):
-                s = "currently not implemented"
-		for led in self._ledList:
-			print led
-                return s
+    def __str__(self):
+        s = "currently not implemented"
+        for led in self._ledList:
+            print led
+            return s
 
 
 # EOF
